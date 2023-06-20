@@ -5,10 +5,10 @@ const path = require('path');
 const dotenv = require('dotenv');
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
-const boxPackageRoutes = require("./routes/boxPackageRoutes");
 const customPackageRoutes = require("./routes/customPackageRoutes");
 const boxTypeRoutes = require("./routes/boxTypeRoutes");
 const authRoutes = require("./routes/authRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 dotenv.config();
 
@@ -35,9 +35,9 @@ db.once("open", () => {
 app.use("/users", userRoutes);
 app.use("/products", productRoutes);
 app.use('/box-types', boxTypeRoutes);
-app.use('/box-packages', boxPackageRoutes);
 app.use('/custom-packages', customPackageRoutes);
 app.use("/auth", authRoutes);
+app.use("/orders", orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 

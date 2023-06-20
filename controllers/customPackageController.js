@@ -9,12 +9,11 @@ const createCustomPackage = async (req, res) => {
 		const productDetails = [];
 
 		for (const product of products) {
-			const { _id, productName } = product.product;
-			const existingProduct = await Product.findById(_id);
+			const existingProduct = await Product.findById(product._id);
 
 			if (!existingProduct) {
 				return res.status(400).json({
-					error: `Produk dengan nama ${productName} tidak ditemukan.`,
+					error: `Produk dengan nama ${product.productName} tidak ditemukan.`,
 				});
 			}
 
@@ -79,6 +78,23 @@ const getCustomPackageById = async (req, res) => {
 	}
 };
 
+// Mendapatkan custom package berdasarkan userID
+const getCustomPackageByUserId = async (req, res) => {
+	const userId = req.params.userId; // Assuming you have the user ID from the request
+
+	try {
+		const customPackages = await CustomPackage.find({ user: userId })
+			.populate("user", "-password -refreshToken")
+			.populate("boxType")
+			.populate("products.product")
+			.exec();
+
+		res.status(200).json(customPackages);
+	} catch (error) {
+		res.status(500).json({ error: "Failed to get custom packages." });
+	}
+};
+
 // Mengupdate custom package berdasarkan ID
 const updateCustomPackage = async (req, res) => {
 	try {
@@ -117,4 +133,5 @@ module.exports = {
 	getCustomPackageById,
 	updateCustomPackage,
 	deleteCustomPackage,
+	getCustomPackageByUserId,
 };

@@ -1,15 +1,16 @@
 const Product = require("../models/productModel");
+const {
+	getCollaborativeFilteringRecommendations,
+	getContentBasedRecommendations,
+	combineRecommendations,
+} = require("../middlewares/recommendationMiddleware");
 const fs = require("fs");
 
 // Controller untuk mendapatkan semua produk
 exports.getAllProducts = async (req, res) => {
 	const search = req.query.search;
-	const boxType = req.query.boxType;
-	const products = req.query.products;
-	console.log("search:", search);
-	console.log("boxType:", boxType);
-	console.log("products:", products);
-
+	const user = req.query.user;
+	console.log(user);
 	try {
 		let products;
 
@@ -22,20 +23,34 @@ exports.getAllProducts = async (req, res) => {
 			products = await Product.find().sort({ category: 1 });
 		}
 
-		// Cek apakah pengguna telah login
-		if (req.user) {
-			// Mendapatkan rekomendasi produk
-			const recommendations = await getRecommendations(products);
+		if (user) {
+			const collaborativeFilteringRecommendations =
+				await getCollaborativeFilteringRecommendations(user);
 
-			// Menggabungkan produk dengan rekomendasi
+			const contentBasedRecommendations = await getContentBasedRecommendations(
+				user
+			);
+			// console.log(contentBasedRecommendations)
+
+			const recommendations = await combineRecommendations(
+				collaborativeFilteringRecommendations,
+				contentBasedRecommendations
+			);
+			let topRecommendations = [];
+			topRecommendations = recommendations.slice(0, 5);
+			// console.log(topRecommendations);
 			const result = {
-				products,
-				recommendations,
+				products: products,
+				recommendations: topRecommendations,
 			};
 
 			res.json(result);
 		} else {
-			res.json(products);
+			const result = {
+				products: products,
+			};
+
+			res.json(result);
 		}
 	} catch (error) {
 		res.status(500).json({ message: error.message });

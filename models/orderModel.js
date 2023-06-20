@@ -1,37 +1,30 @@
 const mongoose = require("mongoose");
-const BoxPackage = require("./boxPackageModel");
-const CustomPackage = require("./customPackageModel");
 
 const orderSchema = new mongoose.Schema(
 	{
-		userId: {
+		user: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
 		},
-        status: {
-            type: string,
-            required: true,
-        },
-		products: [
+		customPackages: [
 			{
-				productType: {
-					type: String,
-					enum: ["BoxPackage", "CustomPackage"],
-					required: true,
-				},
-				productId: {
+				customPackage: {
 					type: mongoose.Schema.Types.ObjectId,
-					refPath: "products.productType",
+					ref: "CustomPackage",
 					required: true,
 				},
 				quantity: {
 					type: Number,
 					required: true,
-					default: 1,
 				},
 			},
 		],
+        status: {
+            type: String,
+            required: true,
+			default: 'menunggu konfirmasi'
+        },
 	},
 	{ timestamps: true, versionKey: false }
 );
